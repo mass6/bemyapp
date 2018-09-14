@@ -13,7 +13,7 @@ class CreateAedTable extends Migration
      */
     public function up()
     {
-        Schema::table('aeds', function (Blueprint $table) {
+        Schema::create('aeds', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('aed_id');
             $table->dateTime('creation_time');
@@ -23,8 +23,15 @@ class CreateAedTable extends Migration
             $table->string('floor');
             $table->string('zip');
             $table->string('city');
-            $table->boolean('inside');
-            $table->boolean('outside');
+            $table->string('inside');
+            $table->string('outside');
+            $table->decimal('latitude', 10, 8);
+            $table->decimal('longitude', 11, 8);
+            $table->string('municipality');
+            $table->string('region');
+            $table->boolean('available_247');
+            $table->string('location_type');
+            $table->string('location_category');
             $table->timestamps();
         });
     }
@@ -36,8 +43,6 @@ class CreateAedTable extends Migration
      */
     public function down()
     {
-        Schema::table('aeds', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('aeds');
     }
 }
