@@ -14,9 +14,9 @@
 
         var map = new mapboxgl.Map({
             style: 'mapbox://styles/mapbox/light-v9',
-            center: [12.567114,55.665983],
-            zoom: 15.5,
-            pitch: 45,
+            center: personLocation,
+            zoom: 15.7,
+            pitch: 60,
             bearing: -17.6,
             container: 'map'    });
 
