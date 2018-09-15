@@ -54,10 +54,14 @@ class MapController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function latest()
+    public function latest(Request $request)
     {
         $deployment = Deployment::with('events')->orderBy('id', 'desc')->limit(1)->first();
         $this->buildData($deployment);
+
+        if ($request->wantsJson()) {
+            return response()->json($deployment);
+        }
 
         return view('deployment', compact('deployment'));
     }
@@ -68,11 +72,15 @@ class MapController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
         /** @var Deployment $deployment */
         $deployment = Deployment::with('events')->find($id);
         $this->buildData($deployment);
+
+        if ($request->wantsJson()) {
+            return response()->json($deployment);
+        }
 
         return view('deployment', compact('deployment'));
     }
@@ -100,6 +108,7 @@ class MapController extends Controller
 
         $result = $result->sortBy('distance')->values();
         JavaScript::put([
+            'deploymnet' => $deployment,
             'incidentLocation' => $location,
             'aedLocations' => $result,
             'aedClosest' => $result->first(),

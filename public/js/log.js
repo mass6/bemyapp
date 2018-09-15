@@ -1,2 +1,2 @@
-let foo = "bar";
-console.log(foo);
+let foobar = "bar";
+console.log(foobar);
