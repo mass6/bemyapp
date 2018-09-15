@@ -36,8 +36,8 @@
                     .then(response => {
                         this.deployment_id = response.data.id;
                         if (this.deployment_id === this.deployment.id) {
-                            console.log('same deployment');
-                            console.log(this.deployment.id);
+//                            console.log('same deployment');
+//                            console.log(this.deployment.id);
                             axios.get('/deployments/'+this.deployment.id)
                                 .then(response => {
                                     this.events = response.data.events;
@@ -46,7 +46,7 @@
                             window.location = window.location;
                         }
                     });
-            }, 250);
+            }, 500);
         }
     }
 </script>
