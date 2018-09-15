@@ -22,4 +22,9 @@ class Deployment extends Model
     {
         return $this->longitude;
     }
+
+    public function events()
+    {
+        return $this->hasMany(DeploymentEvent::class);
+    }
 }

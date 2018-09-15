@@ -16,17 +16,7 @@ class DeploymentsController extends Controller
      */
     public function index()
     {
-        return 'here';
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return Deployment::all();
     }
 
     /**
@@ -53,19 +43,8 @@ class DeploymentsController extends Controller
      */
     public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function launch($id)
-    {
         /** @var Deployment $deployment */
-        return $deployment = Deployment::find($id);
+        $deployment = Deployment::find($id);
 
         $latitude = $deployment->getLatitude();
         $longitude = $deployment->getLongitude();
@@ -86,29 +65,57 @@ class DeploymentsController extends Controller
         });
 
         return $result->sortBy('distance')->values();
-
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
+     * Show the form for editing the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function launch($id)
     {
-        //
+        /** @var Deployment $deployment */
+        $deployment = Deployment::with('events')->find($id);
+
+
+        if (!$deployment->events->contains('name', 'launched')) {
+            $event = $deployment->events()->create([
+                'name' => 'launched',
+            ]);
+            $event->load('deployment');
+        }
+
+        return $event;
+    }
+
+    public function arrive($id)
+    {
+        /** @var Deployment $deployment */
+        $deployment = Deployment::with('events')->find($id);
+
+        if ($deployment->events->contains('name', 'launched') && !$deployment->events->contains('name', 'arrived')) {
+            $event = $deployment->events()->create([
+                'name' => 'arrived',
+            ]);
+            $event->load('deployment');
+        }
+
+        return $event;
+    }
+
+    public function deploy($id)
+    {
+        /** @var Deployment $deployment */
+        $deployment = Deployment::with('events')->find($id);
+
+        if ($deployment->events->contains('name', 'arrived') && !$deployment->events->contains('name', 'deployed')) {
+            $event = $deployment->events()->create([
+                'name' => 'deployed',
+            ]);
+            $event->load('deployment');
+        }
+
+        return $event;
     }
 }
