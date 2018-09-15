@@ -9,15 +9,15 @@
 @section('scripts')
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiamNhLWFnbnRpbyIsImEiOiJjam0yaGQ5NzkwcmNqM3dvNmhoZXNoMmxxIn0.omnmyL5TeU0KqsEPmsYsCQ';
-        var personLocation = [12.567114,55.665983];
+        var personLocation = [incidentLocation.longitude,incidentLocation.latitude] // [12.567114,55.665983];
         var aedLocationClosest =  [parseFloat(aedClosest.longitude),parseFloat(aedClosest.latitude)]
 
         var map = new mapboxgl.Map({
             style: 'mapbox://styles/mapbox/light-v9',
             center: personLocation,
-            zoom: 16,
+            zoom: 17,
             pitch: 80,
-            bearing: 50,
+            bearing: 30,
             container: 'map'    });
 
         map.on('load', function() {
@@ -103,7 +103,7 @@
         function getRoute() {
             var start = aedLocationClosest;
             var end = personLocation;
-            var directionsRequest = 'https://api.mapbox.com/directions/v5/mapbox/cycling/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?geometries=geojson&access_token=' + mapboxgl.accessToken;
+            var directionsRequest = 'https://api.mapbox.com/directions/v5/mapbox/walking/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?geometries=geojson&access_token=' + mapboxgl.accessToken;
             $.ajax({
                 method: 'GET',
                 url: directionsRequest,

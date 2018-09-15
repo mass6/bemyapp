@@ -9,12 +9,39 @@ use JavaScript;
 class MapController extends Controller
 {
 
-    public function test()
+    public function test(Request $request)
     {
 
+        $location = ['latitude' => $request->get('latitude'), 'longitude' => $request->get('longitude')];
+        $lat = $location['latitude'];
+        $long = $location['longitude'];
+
+
+
+        $aeds = AED::where('latitude', '<=', $lat + .002)
+            ->where('latitude', '>=', $lat - .002)
+            ->where('longitude', '<=', $long + .002)
+            ->where('longitude', '>=', $long - .002)
+            ->get();
+
+        $geotools = new \League\Geotools\Geotools();
+        $result = collect([]);
+        $aeds->each(function(AED $aed, $index) use (&$result, $geotools, $lat, $long) {
+            $coordA   = new \League\Geotools\Coordinate\Coordinate([$lat, $long]);
+            $coordB   = new \League\Geotools\Coordinate\Coordinate([$aed->latitude, $aed->longitude]);
+            $distance = $geotools->distance()->setFrom($coordA)->setTo($coordB);
+            $result->push(array_merge($aed->toArray(), ['distance' => $distance->flat()]));
+        });
+
+
+        $result = $result->sortBy('distance')->values();
+
+
+
         JavaScript::put([
-            'aedLocations' => AED::where('city','København K')->take(10)->get(),
-            'aedClosest' => AED::where('city','København K')->first()
+            'incidentLocation' => $location,
+            'aedLocations' => $result,
+            'aedClosest' => $result->first(),
         ]);
 
         return view('map');
