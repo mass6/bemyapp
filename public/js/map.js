@@ -6,7 +6,7 @@ var map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/light-v9',
     center: personLocation,
     zoom: 16,
-    pitch: 25,
+    pitch: 50,
     bearing: 30,
     container: 'map'});
 
