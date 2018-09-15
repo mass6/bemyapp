@@ -13,7 +13,7 @@ class MapController extends Controller
     {
 
         JavaScript::put([
-            'aedLocations' => AED::where('city','København K')->take(5)->get(),
+            'aedLocations' => AED::where('city','København K')->take(10)->get(),
             'aedClosest' => AED::where('city','København K')->first()
         ]);
 

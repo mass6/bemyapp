@@ -10,9 +10,7 @@
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiamNhLWFnbnRpbyIsImEiOiJjam0yaGQ5NzkwcmNqM3dvNmhoZXNoMmxxIn0.omnmyL5TeU0KqsEPmsYsCQ';
         var personLocation = [12.567114,55.665983];
-        var aedLocation = [12.576425,55.673904];
-        //var aedLocations = [12.567114,55.665983], [12.567114,55.665983], [12.567114,55.665983]);
-        console.log(aedLocations);
+        var aedLocationClosest =  [parseFloat(aedClosest.longitude),parseFloat(aedClosest.latitude)]
 
         var map = new mapboxgl.Map({
             style: 'mapbox://styles/mapbox/light-v9',
@@ -32,17 +30,26 @@
                     break;
                 }
             }
-            // Add aed symbol
-            /*
-            for (var i = 0;i < aedLocations.length; i++) {
-                aedLocation = [aedLocations[i]['latitude'], aedLocations[i]['longitude']]
-                */
-            console.log(aedLocation)
 
+            let features = [];
+            for (let i = 0; i < aedLocations.length;i++){
+                //console.log(aedLocations[i].latitude);
+                let longitude = parseFloat(aedLocations[i].longitude);
+                let latitude = parseFloat(aedLocations[i].latitude);
+                //console.log([longitude,latitude]);
+                let location = [longitude , latitude ];
+                features.push(turf.point(location));
+                //console.log(features);
+            }
+            console.log(aedClosest);
+            //console.log(features);
+            //console.log("Features");
             var marker = document.createElement('div');
-            var aed = turf.featureCollection([turf.point(aedLocation)]);
+            var aed = turf.featureCollection(features);
+            let testLocation = [12.562114,55.665983];
+            //var aed = turf.featureCollection([turf.point(aedLocation,{name: 'Location A'}),turf.point(testLocation,{name: 'Location B'})]);
             marker.classList = 'aed';
-            getRoute();
+
 
             // Create a new marker
             personkMarker = new mapboxgl.Marker(marker)
@@ -90,11 +97,11 @@
                     'fill-extrusion-opacity': .6
                 }
             }, labelLayerId);
+            getRoute();
         });
 
-
         function getRoute() {
-            var start = aedLocation;
+            var start = aedLocationClosest;
             var end = personLocation;
             var directionsRequest = 'https://api.mapbox.com/directions/v5/mapbox/cycling/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?geometries=geojson&access_token=' + mapboxgl.accessToken;
             $.ajax({
