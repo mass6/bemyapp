@@ -10,8 +10,31 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+use App\AED;
+use App\AedClosed;
+use App\OpenHours;
+
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/aeds', 'MapController@index');
+
+Route::get('test', function () {
+
+    // return AED::with('hours')->where('aed_id', 1000022371)->first();
+    // return $aed->available === 'Ja' ? 1 : 0;
+    //
+    // AedClosed::chunk(100, function ($aeds) {
+    //     $aeds->each(function($aed, $index) {
+    //         $available = $aed->available === 'Ja' ? 1 : 0;
+    //         $aed->available = $available;
+    //         $aed->save();
+    //     });
+    // });
+    //
+    // return 'done';
 });
 
 Auth::routes();

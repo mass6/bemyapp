@@ -2,14 +2,12 @@
 <html>
 <head>
     <meta charset='utf-8' />
-    <title>Delivery App</title>
+    <title></title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
-    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
     <style>
-
         body {
             margin: 0;
             padding: 0;
@@ -19,35 +17,89 @@
             position: absolute;
             top: 0;
             bottom: 0;
-            right: 0;
-            left: 0;
+            width: 100%;
         }
     </style>
 </head>
 <body>
-<div id='map' class='contain'></div>
+<div id='map'></div>
 <script>
-    var truckLocation = [-83.093, 42.376];
-    var warehouseLocation = [-83.083, 42.363];
-    var lastQueryTime = 0;
-    var lastAtRestaurant = 0;
-    var keepTrack = [];
-    var currentSchedule = [];
-    var currentRoute = null;
-    var pointHopper = {};
-    var pause = true;
-    var speedFactor = 50;
-
-    // Add your access token
     mapboxgl.accessToken = 'pk.eyJ1IjoiamNhLWFnbnRpbyIsImEiOiJjam0yaGQ5NzkwcmNqM3dvNmhoZXNoMmxxIn0.omnmyL5TeU0KqsEPmsYsCQ';
-
-    // Initialize a map
     var map = new mapboxgl.Map({
-        container: 'map', // container id
-        style: 'mapbox://styles/mapbox/light-v9', // stylesheet location
-        center: truckLocation, // starting position
-        zoom: 12 // starting zoom
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v10',
+        center: [-84.5125, 39.1015],
+        zoom: 12
     });
+
+
+
+    map.on('load', function() {
+        getRoute();
+    });
+
+    function getRoute() {
+        var start = [-84.518641, 39.134270];
+        var end = [-84.512023, 39.102779];
+        var directionsRequest = 'https://api.mapbox.com/directions/v5/mapbox/cycling/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?geometries=geojson&access_token=' + mapboxgl.accessToken;
+        $.ajax({
+            method: 'GET',
+            url: directionsRequest,
+        }).done(function(data) {
+            var route = data.routes[0].geometry;
+            map.addLayer({
+                id: 'route',
+                type: 'line',
+                source: {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        geometry: route
+                    }
+                },
+                paint: {
+                    'line-width': 2
+                }
+            });
+
+
+            map.addLayer({
+                id: 'start',
+                type: 'circle',
+                source: {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: start
+                        }
+                    }
+                }
+            });
+            map.addLayer({
+                id: 'end',
+                type: 'circle',
+                source: {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: end
+                        }
+                    }
+                }
+            });
+            // this is where the JavaScript from the next step will go
+
+
+
+        });
+    }
+
+
+
 </script>
 </body>
 </html>
