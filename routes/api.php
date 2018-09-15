@@ -20,6 +20,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/deployments', 'DeploymentsController@index');
     Route::post('/deployments', 'DeploymentsController@store');
     Route::post('/deployments/{id}/launch', 'DeploymentsController@launch');
+    Route::post('/deployments/{id}/enroute', 'DeploymentsController@enroute');
     Route::post('/deployments/{id}/arrive', 'DeploymentsController@arrive');
     Route::post('/deployments/{id}/deploy', 'DeploymentsController@deploy');
 });

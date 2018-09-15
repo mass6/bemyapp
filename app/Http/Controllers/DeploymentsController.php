@@ -84,9 +84,22 @@ class DeploymentsController extends Controller
                 'name' => 'launched',
             ]);
             $event->load('deployment');
+            return $event;
         }
+    }
 
-        return $event;
+    public function enroute($id)
+    {
+        /** @var Deployment $deployment */
+        $deployment = Deployment::with('events')->find($id);
+
+        if ($deployment->events->contains('name', 'launched')) {
+            $event = $deployment->events()->create([
+                'name' => 'enroute',
+            ]);
+            $event->load('deployment');
+            return $event;
+        }
     }
 
     public function arrive($id)
@@ -99,9 +112,8 @@ class DeploymentsController extends Controller
                 'name' => 'arrived',
             ]);
             $event->load('deployment');
+            return $event;
         }
-
-        return $event;
     }
 
     public function deploy($id)
@@ -114,8 +126,7 @@ class DeploymentsController extends Controller
                 'name' => 'deployed',
             ]);
             $event->load('deployment');
+            return $event;
         }
-
-        return $event;
     }
 }
