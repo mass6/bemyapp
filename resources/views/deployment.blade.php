@@ -24,6 +24,4 @@
 
 @section('scripts')
     <script src='/js/map.js'></script>
-    <script src='/js/log.js'></script>
-    <script src='/js/log.js'></script>
 @endsection
