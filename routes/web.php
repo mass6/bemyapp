@@ -15,6 +15,15 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/mapbox', function () {
+    return view('mapbox');
+});
+
+Route::get('map', function (){
+    return view('map');
+});
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
