@@ -21,7 +21,7 @@ Route::get('/', function () {
 
 Route::get('/aeds', 'MapController@index');
 
-Route::post('/', 'CallForHelpController@store');
+Route::get('/aed-find', 'MapController@test');
 
 Route::get('test', function () {
 
