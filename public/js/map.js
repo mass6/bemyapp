@@ -1,14 +1,14 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiamNhLWFnbnRpbyIsImEiOiJjam0yaGQ5NzkwcmNqM3dvNmhoZXNoMmxxIn0.omnmyL5TeU0KqsEPmsYsCQ';
-var personLocation = [incidentLocation.longitude,incidentLocation.latitude] // [12.567114,55.665983];
-var aedLocationClosest =  [parseFloat(aedClosest.longitude),parseFloat(aedClosest.latitude)]
+var personLocation = [incidentLocation.longitude,incidentLocation.latitude]; // [12.567114,55.665983];
+var aedLocationClosest =  [parseFloat(aedClosest.longitude),parseFloat(aedClosest.latitude)];
 
 var map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/light-v9',
     center: personLocation,
-    zoom: 17,
-    pitch: 80,
+    zoom: 16,
+    pitch: 25,
     bearing: 30,
-    container: 'map'    });
+    container: 'map'});
 
 map.on('load', function() {
     // Insert the layer beneath any symbol layer.
@@ -29,14 +29,14 @@ map.on('load', function() {
         //console.log([longitude,latitude]);
         let location = [longitude , latitude ];
         features.push(turf.point(location));
-        //console.log(features);
+//        console.log(features);
     }
-    console.log(aedClosest);
+//    console.log(aedClosest);
     //console.log(features);
     //console.log("Features");
     var marker = document.createElement('div');
     var aed = turf.featureCollection(features);
-    let testLocation = [12.562114,55.665983];
+    //let testLocation = [12.562114,55.665983];
     //var aed = turf.featureCollection([turf.point(aedLocation,{name: 'Location A'}),turf.point(testLocation,{name: 'Location B'})]);
     marker.classList = 'aed';
 
@@ -44,7 +44,7 @@ map.on('load', function() {
     // Create a new marker
     personkMarker = new mapboxgl.Marker(marker)
         .setLngLat(personLocation)
-        .addTo(map)
+        .addTo(map);
 
     map.addLayer({
         id: 'aed',
