@@ -22,7 +22,7 @@
             height: 20px;
             border: 2px solid #fff;
             border-radius: 50%;
-            background: #3887be;
+            background: #be0110;
             pointer-events: none;
         }
         body {
@@ -37,4 +37,5 @@
             width: 100%;
         }
     </style>
+    @yield('styles')
 </head>
