@@ -23,5 +23,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/deployments/{id}/enroute', 'DeploymentsController@enroute');
     Route::post('/deployments/{id}/arrive', 'DeploymentsController@arrive');
     Route::post('/deployments/{id}/deploy', 'DeploymentsController@deploy');
+
 });
 
