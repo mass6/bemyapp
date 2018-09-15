@@ -21,6 +21,8 @@ Route::get('/', function () {
 
 Route::get('/aeds', 'MapController@index');
 
+Route::get('/aed-find', 'MapController@test');
+
 Route::get('test', function () {
 
     // return AED::with('hours')->where('aed_id', 1000022371)->first();

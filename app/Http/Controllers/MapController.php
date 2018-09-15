@@ -8,6 +8,19 @@ use JavaScript;
 
 class MapController extends Controller
 {
+
+    public function test()
+    {
+
+        JavaScript::put([
+            'aedLocations' => AED::where('city','København K')->take(5)->get(),
+            'aedClosest' => AED::where('city','København K')->first()
+        ]);
+
+        return view('map');
+
+    }
+
     /**
      * Display a listing of the resource.
      *
