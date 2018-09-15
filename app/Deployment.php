@@ -4,9 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AED extends Model
+class Deployment extends Model
 {
-    protected $table = 'aeds';
+    protected $guarded = [];
+
+    protected $casts = [
+        'latitude' => 'float',
+        'longitude' => 'float',
+    ];
 
     public function getLatitude()
     {
@@ -16,10 +21,5 @@ class AED extends Model
     public function getLongitude()
     {
         return $this->longitude;
-    }
-
-    public function hours()
-    {
-        return $this->hasMany(OpenHours::class, 'aed_id', 'aed_id');
     }
 }
