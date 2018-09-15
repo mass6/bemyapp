@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\AED;
+use App\Deployment;
 use Illuminate\Http\Request;
 use JavaScript;
+use League\Geotools\Coordinate\Coordinate;
 
 class MapController extends Controller
 {
@@ -27,8 +29,8 @@ class MapController extends Controller
         $geotools = new \League\Geotools\Geotools();
         $result = collect([]);
         $aeds->each(function(AED $aed, $index) use (&$result, $geotools, $lat, $long) {
-            $coordA   = new \League\Geotools\Coordinate\Coordinate([$lat, $long]);
-            $coordB   = new \League\Geotools\Coordinate\Coordinate([$aed->latitude, $aed->longitude]);
+            $coordA   = new Coordinate([$lat, $long]);
+            $coordB   = new Coordinate([$aed->latitude, $aed->longitude]);
             $distance = $geotools->distance()->setFrom($coordA)->setTo($coordB);
             $result->push(array_merge($aed->toArray(), ['distance' => $distance->flat()]));
         });
@@ -46,35 +48,6 @@ class MapController extends Controller
 
         return view('map');
 
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $location = ['latitude' => 55.681878, 'longitude' => 12.590597];
-        $lat = $location['latitude'];
-        $long = $location['longitude'];
-
-        $aeds = AED::where('latitude', '<=', $lat + .003)
-                   ->where('latitude', '>=', $lat - .003)
-                   ->where('longitude', '<=', $long + .004)
-                   ->where('longitude', '>=', $long - .004)
-                   ->get();
-
-        $geotools = new \League\Geotools\Geotools();
-        $result = collect([]);
-        $aeds->each(function(AED $aed, $index) use (&$result, $geotools, $lat, $long) {
-            $coordA   = new \League\Geotools\Coordinate\Coordinate([$lat, $long]);
-            $coordB   = new \League\Geotools\Coordinate\Coordinate([$aed->latitude, $aed->longitude]);
-            $distance = $geotools->distance()->setFrom($coordA)->setTo($coordB);
-            $result->push(array_merge($aed->toArray(), ['distance' => $distance->flat()]));
-        });
-
-        return $result->sortBy('distance')->values();
     }
 
     /**
@@ -98,6 +71,14 @@ class MapController extends Controller
         //
     }
 
+    public function latest()
+    {
+        $deployment = Deployment::orderBy('id', 'desc')->limit(1)->first();
+        $this->buildData($deployment);
+
+        return view('map');
+    }
+
     /**
      * Display the specified resource.
      *
@@ -106,9 +87,43 @@ class MapController extends Controller
      */
     public function show($id)
     {
-        //
+        /** @var Deployment $deployment */
+        $deployment = Deployment::find($id);
+        $this->buildData($deployment);
+
+        return view('map');
     }
 
+    protected function buildData($deployment)
+    {
+        $location = ['latitude' => $deployment->getLatitude(), 'longitude' => $deployment->getLongitude()];
+
+        // 55.673733&longitude=12.564636
+        $lat = $location['latitude'];
+        $long = $location['longitude'];
+
+        $aeds = AED::where('latitude', '<=', $lat + .012)
+                   ->where('latitude', '>=', $lat - .012)
+                   ->where('longitude', '<=', $long + .012)
+                   ->where('longitude', '>=', $long - .012)
+                   ->get();
+
+        $geotools = new \League\Geotools\Geotools();
+        $result = collect([]);
+        $aeds->each(function(AED $aed, $index) use (&$result, $geotools, $lat, $long) {
+            $coordA   = new Coordinate([$lat, $long]);
+            $coordB   = new Coordinate([$aed->getLatitude(), $aed->getLongitude()]);
+            $distance = $geotools->distance()->setFrom($coordA)->setTo($coordB);
+            $result->push(array_merge($aed->toArray(), ['distance' => $distance->flat()]));
+        });
+
+        $result = $result->sortBy('distance')->values();
+        JavaScript::put([
+            'incidentLocation' => $location,
+            'aedLocations' => $result,
+            'aedClosest' => $result->first(),
+        ]);
+    }
     /**
      * Show the form for editing the specified resource.
      *
