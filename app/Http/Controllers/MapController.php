@@ -16,7 +16,7 @@ class MapController extends Controller
     /**
      * Offset to apply for creating an AED search polygon
      */
-    const COORDINATE_OFFSET = .002;
+    const COORDINATE_OFFSET = .004;
 
     /**
      * @param Request $request
@@ -29,11 +29,7 @@ class MapController extends Controller
         $lat = $location['latitude'];
         $long = $location['longitude'];
 
-        $aeds = AED::where('latitude', '<=', $lat + self::COORDINATE_OFFSET)
-            ->where('latitude', '>=', $lat - self::COORDINATE_OFFSET)
-            ->where('longitude', '<=', $long + self::COORDINATE_OFFSET)
-            ->where('longitude', '>=', $long - self::COORDINATE_OFFSET)
-            ->get();
+        $aeds = $this->getNearbyAeds($lat, $long);
 
         $geotools = new \League\Geotools\Geotools();
         $result = collect([]);
@@ -60,10 +56,10 @@ class MapController extends Controller
      */
     public function latest()
     {
-        $deployment = Deployment::orderBy('id', 'desc')->limit(1)->first();
+        $deployment = Deployment::with('events')->orderBy('id', 'desc')->limit(1)->first();
         $this->buildData($deployment);
 
-        return view('map');
+        return view('deployment', compact('deployment'));
     }
 
     /**
@@ -75,10 +71,10 @@ class MapController extends Controller
     public function show($id)
     {
         /** @var Deployment $deployment */
-        $deployment = Deployment::find($id);
+        $deployment = Deployment::with('events')->find($id);
         $this->buildData($deployment);
 
-        return view('map');
+        return view('deployment', compact('deployment'));
     }
 
     /**
@@ -91,11 +87,7 @@ class MapController extends Controller
         $lat = $location['latitude'];
         $long = $location['longitude'];
 
-        $aeds = AED::where('latitude', '<=', $lat + self::COORDINATE_OFFSET)
-                   ->where('latitude', '>=', $lat - self::COORDINATE_OFFSET)
-                   ->where('longitude', '<=', $long + self::COORDINATE_OFFSET)
-                   ->where('longitude', '>=', $long - self::COORDINATE_OFFSET)
-                   ->get();
+        $aeds = $this->getNearbyAeds($lat, $long);
 
         $geotools = new \League\Geotools\Geotools();
         $result = collect([]);
@@ -112,5 +104,22 @@ class MapController extends Controller
             'aedLocations' => $result,
             'aedClosest' => $result->first(),
         ]);
+    }
+
+    /**
+     * @param $lat
+     * @param $long
+     *
+     * @return mixed
+     */
+    protected function getNearbyAeds($lat, $long)
+    {
+        $aeds = AED::where('inside', 0)
+                   ->where('latitude', '<=', $lat + self::COORDINATE_OFFSET)
+                   ->where('latitude', '>=', $lat - self::COORDINATE_OFFSET)
+                   ->where('longitude', '<=', $long + self::COORDINATE_OFFSET)
+                   ->where('longitude', '>=', $long - self::COORDINATE_OFFSET)->get();
+
+        return $aeds;
     }
 }
