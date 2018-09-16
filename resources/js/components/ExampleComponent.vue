@@ -26,27 +26,32 @@
         data() {
             return {
                 deployment_id: '',
+                complete: false,
                 events: []
             }
         },
         mounted() {
-            let that = this;
-            setInterval( () => {
+            setInterval(() => {
                 axios.get('/deployments/latest')
                     .then(response => {
                         this.deployment_id = response.data.id;
                         if (this.deployment_id === this.deployment.id) {
-//                            console.log('same deployment');
-//                            console.log(this.deployment.id);
-                            axios.get('/deployments/'+this.deployment.id)
-                                .then(response => {
-                                    this.events = response.data.events;
-                                });
+                            if (this.complete === false) {
+                                axios.get('/deployments/' + this.deployment.id)
+                                    .then(response => {
+                                        this.events = response.data.events;
+                                        if (this.events.find(function(event) {
+                                            return event.name === 'deployed';
+                                        })) {
+                                            this.complete = true;
+                                        }
+                                    });
+                            }
                         } else {
-                            window.location = window.location;
+                            window.location.reload();
                         }
                     });
-            }, 500);
+            }, 1000);
         }
     }
 </script>
