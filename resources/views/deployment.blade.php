@@ -19,9 +19,9 @@
 
 @section('content')
     <div id='map'></div>
-    @include('legend')
+    {{--@include('legend')--}}
 @endsection
 
-@section('scripts')
-    <script src='/js/map.js'></script>
-@endsection
+{{--@section('scripts')--}}
+    {{--<script src='/js/map.js'></script>--}}
+{{--@endsection--}}
