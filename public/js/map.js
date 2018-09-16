@@ -14,6 +14,38 @@ map.on('click', function (e) {
     console.log(e.lngLat);
 });
 map.on('load', function () {
+    // Load image
+
+    map.loadImage('/images/aed-100.png', function(error, aedImg) {
+        if (error) throw error;
+        map.addImage('aed', aedImg);
+        /*map.addLayer({
+            "id": "points",
+            "type": "symbol",
+            "source": {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": [{
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": personLocation
+                        }
+                    }]
+                }
+            },
+            "layout": {
+                "icon-image": "aed",
+                "icon-size": 0.25
+            }
+        });*/
+    });
+    map.loadImage('/images/ocha-120.png', function(error, personImg) {
+        if (error) throw error;
+        map.addImage('person', personImg);
+    });
+
     // Insert the layer beneath any symbol layer.
     var layers = map.getStyle().layers;
     var labelLayerId;
@@ -39,31 +71,62 @@ map.on('load', function () {
     //console.log("Features");
     var aedMarker = document.createElement('div');
     var aed = turf.featureCollection(features);
+    console.log(aed);
     //let testLocation = [12.562114,55.665983];
     //var aed = turf.featureCollection([turf.point(aedLocation,{name: 'Location A'}),turf.point(testLocation,{name: 'Location B'})]);
     aedMarker.classList = 'aed';
 
+    var personMarker = document.createElement('div');
+    var person = turf.featureCollection([turf.point(personLocation,{name: 'Incident'})]);
+    personMarker.classList = 'person';
+
+
 
     // Create a new marker
-    var personMarker = document.createElement('div');
+/*    var personMarker = document.createElement('div');
     personMarker.classList = 'person';
     personkMarker = new mapboxgl.Marker(personMarker)
         .setLngLat(personLocation)
-        .addTo(map);
+        .addTo(map);*/
 
     map.addLayer({
-        id: 'aed',
-        type: 'circle',
+        id: 'person',
+        /*type: 'circle',*/
+        type: 'symbol',
         source: {
-            data: aed,
+            data: person,
             type: 'geojson'
         },
+        "layout": {
+            "icon-image": "person",
+            "icon-size": 0.25
+        }
+        /*
         paint: {
             'circle-radius': 10,
             'circle-color': 'green',
             'circle-stroke-color': '#0FB75E',
-            'circle-stroke-width': 2
+           */
+    });
+
+    map.addLayer({
+        id: 'aed',
+        /*type: 'circle',*/
+        type: 'symbol',
+        source: {
+            data: aed,
+            type: 'geojson'
+        },
+        "layout": {
+            "icon-image": "aed",
+            "icon-size": 0.25
         }
+        /*
+        paint: {
+            'circle-radius': 10,
+            'circle-color': 'green',
+            'circle-stroke-color': '#0FB75E',
+           */
     });
 
 
