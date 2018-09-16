@@ -7,11 +7,9 @@
 
                     <div class="card-body">
                         <div v-if="events.length">
-                            <ul>
-                                <li v-for="event in events">
-                                    {{event.name}} : <small>{{event.created_at}}</small>
-                                </li>
-                            </ul>
+                                <div v-for="event in events" class="log-event">
+                                    <div class="event-container">{{event.name}} : <span class="time-stamp">{{event.created_at}}</span></div>
+                                </div>
                         </div>
                     </div>
                 </div>
@@ -19,7 +17,28 @@
         </div>
     </div>
 </template>
-
+<style>
+    .card-header {
+        font-size: 1.5em;
+        font-weight: 600;
+        margin-bottom: 25px;
+        margin-top: 20px;
+    }
+    .log-event {
+        background-color: #d0211c;
+        margin-top: 9px;
+        text-transform: uppercase;
+    }
+    .event-container {
+        background-color: #fafbdc;
+        padding: 20px 5px;
+        margin: 2px;
+    }
+    .time-stamp {
+        font-size: .85em;
+        font-weight: 200;
+    }
+</style>
 <script>
     export default {
         props: ['deployment'],
