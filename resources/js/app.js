@@ -16,6 +16,7 @@ window.Vue = require('vue');
  */
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('power-component', require('./components/PowerComponent.vue'));
 
 const app = new Vue({
     el: '#logger'
