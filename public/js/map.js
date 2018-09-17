@@ -1,6 +1,6 @@
 mapboxgl.accessToken = 'pk.eyJ1IjoiamNhLWFnbnRpbyIsImEiOiJjam0yaGQ5NzkwcmNqM3dvNmhoZXNoMmxxIn0.omnmyL5TeU0KqsEPmsYsCQ';
-var personLocation = [incidentLocation.longitude,incidentLocation.latitude]; // [12.567114,55.665983];
-var aedLocationClosest =  [parseFloat(aedClosest.longitude),parseFloat(aedClosest.latitude)];
+var personLocation = [parseFloat(incidentLocation.longitude), parseFloat(incidentLocation.latitude)]; // [12.567114,55.665983];
+var aedLocationClosest = [parseFloat(aedClosest.longitude), parseFloat(aedClosest.latitude)];
 
 var map = new mapboxgl.Map({
     style: 'mapbox://styles/mapbox/light-v9',
@@ -8,9 +8,44 @@ var map = new mapboxgl.Map({
     zoom: 16,
     pitch: 50,
     bearing: 30,
-    container: 'map'});
+    container: 'map'
+});
+map.on('click', function (e) {
+    console.log(e.lngLat);
+});
+map.on('load', function () {
+    // Load image
 
-map.on('load', function() {
+    map.loadImage('/images/aed-100.png', function(error, aedImg) {
+        if (error) throw error;
+        map.addImage('aed', aedImg);
+        /*map.addLayer({
+            "id": "points",
+            "type": "symbol",
+            "source": {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": [{
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": personLocation
+                        }
+                    }]
+                }
+            },
+            "layout": {
+                "icon-image": "aed",
+                "icon-size": 0.25
+            }
+        });*/
+    });
+    map.loadImage('/images/ocha-120.png', function(error, personImg) {
+        if (error) throw error;
+        map.addImage('person', personImg);
+    });
+
     // Insert the layer beneath any symbol layer.
     var layers = map.getStyle().layers;
     var labelLayerId;
@@ -22,43 +57,76 @@ map.on('load', function() {
     }
 
     let features = [];
-    for (let i = 0; i < aedLocations.length;i++){
+    for (let i = 0; i < aedLocations.length; i++) {
         //console.log(aedLocations[i].latitude);
         let longitude = parseFloat(aedLocations[i].longitude);
         let latitude = parseFloat(aedLocations[i].latitude);
         //console.log([longitude,latitude]);
-        let location = [longitude , latitude ];
+        let location = [longitude, latitude];
         features.push(turf.point(location));
 //        console.log(features);
     }
 //    console.log(aedClosest);
     //console.log(features);
     //console.log("Features");
-    var marker = document.createElement('div');
+    var aedMarker = document.createElement('div');
     var aed = turf.featureCollection(features);
+    console.log(aed);
     //let testLocation = [12.562114,55.665983];
     //var aed = turf.featureCollection([turf.point(aedLocation,{name: 'Location A'}),turf.point(testLocation,{name: 'Location B'})]);
-    marker.classList = 'aed';
+    aedMarker.classList = 'aed';
+
+    var personMarker = document.createElement('div');
+    var person = turf.featureCollection([turf.point(personLocation,{name: 'Incident'})]);
+    personMarker.classList = 'person';
+
 
 
     // Create a new marker
-    personkMarker = new mapboxgl.Marker(marker)
+/*    var personMarker = document.createElement('div');
+    personMarker.classList = 'person';
+    personkMarker = new mapboxgl.Marker(personMarker)
         .setLngLat(personLocation)
-        .addTo(map);
+        .addTo(map);*/
 
     map.addLayer({
-        id: 'aed',
-        type: 'circle',
+        id: 'person',
+        /*type: 'circle',*/
+        type: 'symbol',
         source: {
-            data: aed,
+            data: person,
             type: 'geojson'
         },
+        "layout": {
+            "icon-image": "person",
+            "icon-size": 0.25
+        }
+        /*
         paint: {
             'circle-radius': 10,
             'circle-color': 'green',
             'circle-stroke-color': '#0FB75E',
-            'circle-stroke-width': 2
+           */
+    });
+
+    map.addLayer({
+        id: 'aed',
+        /*type: 'circle',*/
+        type: 'symbol',
+        source: {
+            data: aed,
+            type: 'geojson'
+        },
+        "layout": {
+            "icon-image": "aed",
+            "icon-size": 0.25
         }
+        /*
+        paint: {
+            'circle-radius': 10,
+            'circle-color': 'green',
+            'circle-stroke-color': '#0FB75E',
+           */
     });
 
 
@@ -90,15 +158,18 @@ map.on('load', function() {
     getRoute();
 });
 
+
 function getRoute() {
     var start = aedLocationClosest;
     var end = personLocation;
     var directionsRequest = 'https://api.mapbox.com/directions/v5/mapbox/walking/' + start[0] + ',' + start[1] + ';' + end[0] + ',' + end[1] + '?geometries=geojson&access_token=' + mapboxgl.accessToken;
+    console.log(directionsRequest);
     $.ajax({
         method: 'GET',
         url: directionsRequest,
-    }).done(function(data) {
+    }).done(function (data) {
         var route = data.routes[0].geometry;
+        console.log(route);
         map.addLayer({
             id: 'route',
             type: 'line',
@@ -110,8 +181,8 @@ function getRoute() {
                 }
             },
             paint: {
-                'line-width': 4,
-                'line-color': '#2527c4'
+                'line-width': 6,
+                'line-color': '#4b9fc4'
             }
         });
         // this is where the code from the next step will go
